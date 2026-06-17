@@ -1,0 +1,74 @@
+export default {
+  app: {
+    subtitle:
+      '문서는 서버에 저장되지 않으며 그 어디에도 업로드되지 않습니다.\n사용자의 브라우저 안에서 바로 EPUB으로 변환됩니다.',
+    skipped: '지원하지 않아 건너뛴 파일: {{names}}',
+  },
+  fonts: {
+    'noto-serif-kr': '본명조 (명조체)',
+    'noto-sans-kr': '본고딕 (고딕체)',
+    pretendard: 'Pretendard',
+    ridibatang: '리디바탕',
+  },
+  intake: {
+    title: '파일을 여기에 끌어다 놓거나 눌러서 선택하세요',
+    hint: 'txt · docx · hwpx · hwp, 또는 이들을 담은 zip 파일을 EPUB으로 변환합니다.',
+  },
+  reflow: {
+    legend: '문단 정리',
+    join: '줄바꿈으로 끊긴 문장을 한 문단으로 합치기',
+    joinSpace: '줄을 합칠 때 사이에 공백 넣기',
+    terminators: '문단이 끝났다고 볼 문자',
+    exampleTitle: '지금 설정대로면 이렇게 정리돼요',
+    exampleLines: [
+      '“좋은 아침.” 그가 말했다',
+      '그녀는 살짝',
+      '고개를 끄덕였다.',
+      '다음 이야기가 시작된다',
+    ],
+  },
+  style: {
+    legend: '서식 (모든 책에 적용)',
+    font: '글꼴',
+    fontSize: '글자 크기',
+    lineHeight: '줄 간격',
+    marginLeft: '왼쪽 여백',
+    marginRight: '오른쪽 여백',
+    spacingTop: '문단 위 간격',
+    spacingBottom: '문단 아래 간격',
+    indent: '첫 줄 들여쓰기',
+  },
+  preview: {
+    title: '미리보기',
+    caption: '{{font}} · {{size}}px',
+    sample: [
+      '가나다라마바사 아자차카타파하.',
+      '“책으로 읽기 좋은 글꼴인지 미리 확인해 보세요.” The quick brown fox. 日本語 中文 123.',
+      '문단 간격과 들여쓰기, 줄 간격이 실제 EPUB과 동일하게 보입니다.',
+    ],
+  },
+  batch: {
+    count: '{{n}}개',
+    convertAll: '전체 변환 후 ZIP 내려받기',
+    converting: '전체 변환 중… ({{done}}/{{total}})',
+  },
+  book: {
+    cover: '표지 이미지 선택',
+    coverAuto: '자동 표지',
+    coverReset: '표지 삭제',
+    title: '제목',
+    author: '저자',
+    authorPlaceholder: '(선택)',
+    remove: '제거',
+    converting: '변환 중…',
+    download: '변환',
+  },
+  theme: { toggle: '밝게/어둡게 전환' },
+  language: { label: '언어' },
+  share: {
+    save: '설정 저장',
+    modalTitle: '링크가 복사되었습니다',
+    modalMessage: '복사된 주소로 접속하면 이 설정이 그대로 유지됩니다.',
+    close: '닫기',
+  },
+};

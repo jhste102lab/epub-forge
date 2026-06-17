@@ -1,0 +1,68 @@
+export default {
+  app: {
+    subtitle: '您的文档不会存储在服务器上，也不会上传到任何地方。\n直接在您的浏览器中转换为 EPUB。',
+    skipped: '已跳过不支持的文件：{{names}}',
+  },
+  fonts: {
+    'noto-serif-kr': 'Noto Serif（衬线）',
+    'noto-sans-kr': 'Noto Sans（黑体）',
+    pretendard: 'Pretendard',
+    ridibatang: 'RIDIBatang（衬线）',
+  },
+  intake: {
+    title: '将文件拖到此处，或点击选择',
+    hint: '支持 txt · docx · hwpx · hwp，或包含它们的 zip，转换为 EPUB。',
+  },
+  reflow: {
+    legend: '段落整理',
+    join: '将换行断开的句子合并为完整段落',
+    joinSpace: '合并行时插入空格',
+    terminators: '视为段落结束的字符',
+    exampleTitle: '按当前设置，会整理成：',
+    exampleLines: ['“早上好。”他说', '她轻轻', '点了点头。', '接着下一幕开始了'],
+  },
+  style: {
+    legend: '排版（应用于所有书）',
+    font: '字体',
+    fontSize: '字号',
+    lineHeight: '行距',
+    marginLeft: '左边距',
+    marginRight: '右边距',
+    spacingTop: '段前间距',
+    spacingBottom: '段后间距',
+    indent: '首行缩进',
+  },
+  preview: {
+    title: '预览',
+    caption: '{{font}} · {{size}}px',
+    sample: [
+      '天地玄黄，宇宙洪荒。',
+      '“看看这个字体是否易读。”The quick brown fox. 가나다 日本語 123.',
+      '段落间距、缩进和行距与实际 EPUB 一致。',
+    ],
+  },
+  batch: {
+    count: '{{n}} 个',
+    convertAll: '全部转换并下载 ZIP',
+    converting: '转换中…（{{done}}/{{total}}）',
+  },
+  book: {
+    cover: '选择封面图片',
+    coverAuto: '自动封面',
+    coverReset: '删除封面',
+    title: '标题',
+    author: '作者',
+    authorPlaceholder: '（可选）',
+    remove: '移除',
+    converting: '转换中…',
+    download: '转换',
+  },
+  theme: { toggle: '切换浅色/深色' },
+  language: { label: '语言' },
+  share: {
+    save: '保存设置',
+    modalTitle: '链接已复制',
+    modalMessage: '打开复制的链接即可恢复这些设置。',
+    close: '关闭',
+  },
+};

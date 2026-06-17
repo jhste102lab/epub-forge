@@ -1,0 +1,75 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="browserGradient" x1="176" y1="190" x2="817" y2="775" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#146BFF"/>
+      <stop offset="0.56" stop-color="#1689F6"/>
+      <stop offset="1" stop-color="#11B9A6"/>
+    </linearGradient>
+    <linearGradient id="pageBlue" x1="244" y1="390" x2="520" y2="730" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F4FAFF"/>
+      <stop offset="1" stop-color="#DCEBFF"/>
+    </linearGradient>
+    <linearGradient id="foldBlue" x1="420" y1="390" x2="516" y2="510" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#BFD6F7"/>
+      <stop offset="1" stop-color="#8DB8EE"/>
+    </linearGradient>
+    <linearGradient id="bookGradient" x1="489" y1="803" x2="771" y2="398" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1577FF"/>
+      <stop offset="0.42" stop-color="#17B6CF"/>
+      <stop offset="1" stop-color="#12C5A7"/>
+    </linearGradient>
+    <linearGradient id="bookBack" x1="617" y1="455" x2="835" y2="762" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#18CABB"/>
+      <stop offset="1" stop-color="#08A998"/>
+    </linearGradient>
+    <linearGradient id="sparkGradient" x1="500" y1="330" x2="648" y2="470" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#23D2C2"/>
+      <stop offset="1" stop-color="#0CAFA4"/>
+    </linearGradient>
+    <filter id="softShadow" x="110" y="145" width="804" height="742" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#0A5577" flood-opacity="0.12"/>
+    </filter>
+    <filter id="pageShadow" x="195" y="350" width="674" height="505" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#2C7FA7" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#softShadow)">
+    <!-- Browser window interior -->
+    <rect x="198" y="306" width="628" height="422" rx="38" fill="white"/>
+    <!-- Browser window frame -->
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M242 184H782C826.183 184 862 219.817 862 264V700C862 744.183 826.183 780 782 780H242C197.817 780 162 744.183 162 700V264C162 219.817 197.817 184 242 184ZM236 306C215.013 306 198 323.013 198 344V690C198 710.987 215.013 728 236 728H788C808.987 728 826 710.987 826 690V344C826 323.013 808.987 306 788 306H236Z" fill="url(#browserGradient)"/>
+    <circle cx="254" cy="250" r="18" fill="white" opacity="0.96"/>
+    <circle cx="310" cy="250" r="18" fill="white" opacity="0.96"/>
+    <circle cx="366" cy="250" r="18" fill="white" opacity="0.96"/>
+  </g>
+
+  <g filter="url(#pageShadow)">
+    <!-- Left document page -->
+    <path d="M264 398C264 382.536 276.536 370 292 370H418L520 472V642C520 667.5 503.6 689.2 480.4 696.7C436.9 710.8 393.9 727.7 357.5 754C333.8 736.3 300.2 725.3 263.5 725.3C249.1 725.3 237.4 713.6 237.4 699.2V424.6C237.4 409.9 249.3 398 264 398Z" fill="url(#pageBlue)"/>
+    <path d="M418 370L520 472H455C434.565 472 418 455.435 418 435V370Z" fill="url(#foldBlue)" opacity="0.85"/>
+    <path d="M312 488C356 491 399 498 446 508" stroke="#9BBEEC" stroke-width="14" stroke-linecap="round" opacity="0.8"/>
+    <path d="M312 538C360 542 406 549 446 558" stroke="#9BBEEC" stroke-width="14" stroke-linecap="round" opacity="0.8"/>
+    <path d="M312 588C363 592 407 599 446 608" stroke="#9BBEEC" stroke-width="14" stroke-linecap="round" opacity="0.8"/>
+    <path d="M312 638C363 642 407 649 446 658" stroke="#9BBEEC" stroke-width="14" stroke-linecap="round" opacity="0.8"/>
+
+    <!-- Right book back pages -->
+    <path d="M748 432C784 436 817.5 451.7 845 478.5V700.5C845 738 817 761.5 775.5 763C671.5 766.8 586.8 794.7 507 840C565.4 748.3 641.5 704.5 790 690.5V456.5C777 447.3 763.1 439.2 748 432Z" fill="url(#bookBack)"/>
+    <path d="M753 448C782 452 808 464 829 482V691C829 718.5 809.3 736.8 777.4 738.5C699 742.6 633 760 565 795C614 727 685 704 769 692V464C764 458.5 758.7 453.2 753 448Z" fill="#EFFFFD" opacity="0.98"/>
+    <path d="M760 468C782 473 800 482.8 816 498V684C816 704 801.5 716.4 775 719.5C707 727.4 643 744.8 586 773C639 719.8 700 696.5 758 687V468Z" fill="url(#bookBack)"/>
+
+    <!-- Main transformed EPUB page -->
+    <path d="M500 835C587 739 561 520 632 449C664.4 416.6 708.5 394.8 758 384V664C644 674.2 566.7 719.6 500 835Z" fill="url(#bookGradient)"/>
+
+    <!-- Page-flow ribbon between document and book -->
+    <path d="M369 724C428.5 723 468.5 746.6 500 835C435 777.3 361.5 747.6 245 750C224 750.4 206 733.5 206 712.5V690C285 688.5 337.2 690.5 369 724Z" fill="url(#browserGradient)"/>
+    <path d="M375 723C425 724.4 465 753 499 835C443 790.4 389.5 774.3 317 770.8C287.5 769.4 256.3 771 223 775.5C244 747.5 301 736.2 375 723Z" fill="#F7FBFF" opacity="0.97"/>
+    <path d="M500 835C557 755 623 714.2 715 695C629 726.5 570.3 774.3 500 835Z" fill="#F7FBFF" opacity="0.98"/>
+  </g>
+
+  <!-- Sparkles and conversion particles -->
+  <path d="M563 336C574.9 387.8 600.2 413.1 652 425C600.2 436.9 574.9 462.2 563 514C551.1 462.2 525.8 436.9 474 425C525.8 413.1 551.1 387.8 563 336Z" fill="url(#sparkGradient)"/>
+  <path d="M527 479C533.1 505.8 546.2 518.9 573 525C546.2 531.1 533.1 544.2 527 571C520.9 544.2 507.8 531.1 481 525C507.8 518.9 520.9 505.8 527 479Z" fill="url(#sparkGradient)"/>
+  <circle cx="626" cy="382" r="11" fill="#16BEB5"/>
+  <circle cx="537" cy="618" r="9" fill="#16BEB5"/>
+</svg>
