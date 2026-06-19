@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DEFAULT_FONT_ID } from '../core/fonts/catalog';
 import { DEFAULT_REFLOW_OPTIONS } from '../core/reflow/reflow';
@@ -25,6 +25,9 @@ const DEFAULT_SETTINGS: ShareableSettings = {
   style: DEFAULT_STYLE,
   fontId: DEFAULT_FONT_ID,
 };
+
+const GITHUB_URL = 'https://github.com/jhste102lab/epub-forge';
+const TISTORY_URL = 'https://jhste102lab.tistory.com';
 
 export function App(): JSX.Element {
   const { t } = useTranslation();
@@ -66,6 +69,14 @@ export function App(): JSX.Element {
             height="38"
           />
           <span className="brand__name">epub-forge</span>
+          <div className="brand__links" aria-label="Project links">
+            <IconLink href={GITHUB_URL} label="GitHub">
+              <GitHubIcon />
+            </IconLink>
+            <IconLink href={TISTORY_URL} label="Tistory">
+              <TistoryIcon />
+            </IconLink>
+          </div>
         </div>
         <div className="topbar__controls">
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
@@ -142,5 +153,44 @@ export function App(): JSX.Element {
         <StylePreview style={typography.style} fontId={typography.fontId} />
       </section>
     </main>
+  );
+}
+
+function IconLink({
+  href,
+  label,
+  children,
+}: {
+  readonly href: string;
+  readonly label: string;
+  readonly children: ReactNode;
+}): JSX.Element {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className="brand__link"
+      aria-label={label}
+      title={label}
+    >
+      {children}
+    </a>
+  );
+}
+
+function GitHubIcon(): JSX.Element {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18" fill="currentColor">
+      <path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.9c-2.9.6-3.5-1.2-3.5-1.2-.5-1.1-1.1-1.4-1.1-1.4-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.4 1.1 3 .8.1-.7.4-1.1.7-1.4-2.3-.3-4.7-1.2-4.7-5A3.9 3.9 0 0 1 6.6 7.5c-.1-.3-.4-1.3.1-2.6 0 0 .9-.3 2.8 1a9.6 9.6 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.3.2 2.3.1 2.6a3.9 3.9 0 0 1 1.1 2.8c0 3.8-2.4 4.7-4.7 5 .4.3.8 1 .8 2V21c0 .3.2.6.8.5A10 10 0 0 0 12 2Z" />
+    </svg>
+  );
+}
+
+function TistoryIcon(): JSX.Element {
+  return (
+    <svg viewBox="0 0 459 459" aria-hidden="true" width="18" height="18" fill="currentColor">
+      <path d="M229.5,0C102.75,0,0,102.75,0,229.5S102.75,459,229.5,459,459,356.25,459,229.5,356.25,0,229.5,0ZM130.21,191.45a39.57,39.57,0,1,1,39.56-39.57A39.58,39.58,0,0,1,130.21,191.45ZM229.5,390a39.56,39.56,0,1,1,39.56-39.56A39.56,39.56,0,0,1,229.5,390Zm0-99.29a39.56,39.56,0,1,1,39.56-39.56A39.56,39.56,0,0,1,229.5,290.74Zm0-99.29a39.57,39.57,0,1,1,39.56-39.57A39.57,39.57,0,0,1,229.5,191.45Zm99.29,0a39.57,39.57,0,1,1,39.57-39.57A39.57,39.57,0,0,1,328.79,191.45Z" />
+    </svg>
   );
 }

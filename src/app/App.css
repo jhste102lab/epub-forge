@@ -91,6 +91,30 @@ body {
   color: transparent;
 }
 
+.brand__links {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: 0.15rem;
+}
+
+.brand__link {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: var(--muted);
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.brand__link:hover {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
 .topbar__controls {
   display: flex;
   align-items: center;

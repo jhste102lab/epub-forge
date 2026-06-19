@@ -1,6 +1,6 @@
 version: 1
 mode: advisory
-installed_at: "2026-06-18T15:26:51.569Z"
+installed_at: '2026-06-18T15:26:51.569Z'
 adapters:
   codex: auto
   claude: auto
