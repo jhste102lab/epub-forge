@@ -1,5 +1,7 @@
 <!-- jhste-skills:start -->
+
 ## Agent skills
+
 This repo uses jhste skills as shared guidance.
 Repo-local instructions in this file remain authoritative.
 File, repo, command, issue, PR, or other external side effects are allowed when the user directly requested that workflow or repo-local standing approval covers it.
@@ -16,6 +18,7 @@ If guard or red-team review reports new warnings on changed files, attempt a bou
 Before declaring non-trivial code work complete, use the `jhste-red-team-review` skill.
 Skip red-team review for docs-only, comment-only, formatting-only, or trivial rename-only changes.
 Do not enter an unbounded fix/review loop; stop after at most two fix + re-review cycles and report remaining risks.
+
 <!-- jhste-skills:end -->
 
 ## Secrets and env
