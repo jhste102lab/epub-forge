@@ -51,7 +51,7 @@ describe('buildEpub', () => {
   });
 
   it('renders paragraphs and escapes XML', () => {
-    const chapter = unzip(makeBook())['OEBPS/chapter-1.xhtml'];
+    const chapter = unzip(makeBook())['OEBPS/chapter-0001.xhtml'];
     expect(chapter).toContain('<p>첫 문단입니다.</p>');
     expect(chapter).toContain('&amp; &lt;태그&gt;');
   });
@@ -68,7 +68,28 @@ describe('buildEpub', () => {
     });
     const archive = unzipSync(buildEpub(book, DEFAULT_STYLE));
     expect(archive['OEBPS/cover.png']).toEqual(new Uint8Array([1, 2, 3, 4]));
-    expect(strFromU8(archive['OEBPS/content.opf'])).toContain('properties="cover-image"');
+    const opf = strFromU8(archive['OEBPS/content.opf']);
+    expect(opf).toContain('properties="cover-image"');
+    expect(opf).toContain('<meta name="cover" content="cover-image"/>');
+    expect(opf).toContain('<itemref idref="cover"/>');
+    expect(opf).not.toContain('linear="no"');
+  });
+
+  it('splits large books into multiple spine chapters without adding TOC noise', () => {
+    const book = makeBook({
+      paragraphs: Array.from({ length: 90 }, (_, index) => `문단 ${index} ${'가'.repeat(300)}`),
+    });
+    const files = unzip(book);
+    const chapterPaths = Object.keys(files).filter((path) =>
+      /OEBPS\/chapter-\d{4}\.xhtml/.test(path),
+    );
+    expect(chapterPaths.length).toBeGreaterThan(1);
+    expect(files['OEBPS/content.opf']).toContain('<itemref idref="chapter1"/>');
+    expect(files['OEBPS/content.opf']).toContain(
+      `<itemref idref="chapter${chapterPaths.length}"/>`,
+    );
+    expect(files['OEBPS/nav.xhtml'].match(/<li>/g) ?? []).toHaveLength(1);
+    expect(files['OEBPS/nav.xhtml']).toContain('href="chapter-0001.xhtml"');
   });
 
   it('embeds a font and wires the @font-face + manifest item', () => {

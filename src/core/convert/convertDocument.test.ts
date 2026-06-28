@@ -18,7 +18,7 @@ describe('convertDocument', () => {
 
     const archive = unzipSync(result.bytes);
     expect(strFromU8(archive['mimetype'])).toBe('application/epub+zip');
-    const chapter = strFromU8(archive['OEBPS/chapter-1.xhtml']);
+    const chapter = strFromU8(archive['OEBPS/chapter-0001.xhtml']);
     expect(chapter).toContain('<p>첫 문단.</p>');
     expect(chapter).toContain('<p>둘째 문단.</p>');
   });
