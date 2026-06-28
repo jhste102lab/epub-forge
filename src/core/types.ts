@@ -29,13 +29,15 @@ export interface Style {
 
 /**
  * One output EPUB. There is a strict one-to-one relationship with a Document.
- * A Book carries its own Title, author, and Cover; its body is a flat list of
- * paragraphs and its single table-of-contents entry equals the Title.
+ * A Book carries its own Title, author, optional display title for the table of
+ * contents, and Cover; its body is a flat list of paragraphs.
  */
 export interface Book {
   readonly id: string;
   readonly title: string;
   readonly author: string;
+  /** Display text for the one top-level table-of-contents entry. Falls back to Title. */
+  readonly tocTitle?: string;
   /** BCP-47 language tag, e.g. "ko". */
   readonly language: string;
   readonly paragraphs: readonly string[];

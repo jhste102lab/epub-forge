@@ -57,6 +57,8 @@ export default {
     coverAuto: 'Auto cover',
     coverReset: 'Remove cover',
     title: 'Title',
+    tocTitle: 'TOC title',
+    tocTitlePlaceholder: 'Uses title if blank',
     author: 'Author',
     authorPlaceholder: '(optional)',
     remove: 'Remove',

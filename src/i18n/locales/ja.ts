@@ -57,6 +57,8 @@ export default {
     coverAuto: '自動表紙',
     coverReset: '表紙を削除',
     title: 'タイトル',
+    tocTitle: '目次タイトル',
+    tocTitlePlaceholder: '空ならタイトルを使用',
     author: '著者',
     authorPlaceholder: '（任意）',
     remove: '削除',

@@ -9,7 +9,7 @@ export type DraftCover = { readonly kind: 'auto' } | ({ readonly kind: 'image' }
 
 /**
  * A pending Book in the batch: one source Document plus the per-Book metadata
- * the user can edit (Title, author, Cover) before conversion. These are
+ * the user can edit (Title, TOC title, author, Cover) before conversion. These are
  * per-Book; Style and Reflow are batch-wide and live elsewhere.
  */
 export interface BookDraft {
@@ -17,9 +17,10 @@ export interface BookDraft {
   readonly file: FileLike;
   readonly sourceName: string;
   readonly title: string;
+  readonly tocTitle: string;
   readonly author: string;
   readonly cover: DraftCover;
 }
 
 /** Editable text fields of a BookDraft. */
-export type BookDraftPatch = Partial<Pick<BookDraft, 'title' | 'author'>>;
+export type BookDraftPatch = Partial<Pick<BookDraft, 'title' | 'tocTitle' | 'author'>>;

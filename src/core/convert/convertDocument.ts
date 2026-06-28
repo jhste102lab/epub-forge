@@ -21,6 +21,7 @@ export interface EmbedFontSource {
 export interface ConvertOptions {
   readonly title?: string;
   readonly author?: string;
+  readonly tocTitle?: string;
   readonly language?: string;
   readonly cover?: Cover;
   readonly style?: Style;
@@ -44,10 +45,12 @@ export async function convertDocument(
   options: ConvertOptions = {},
 ): Promise<ConvertResult> {
   const parsed = await resolveParser(file).parse(file);
+  const tocTitle = options.tocTitle?.trim();
   const book: Book = {
     id: uuid(),
     title: options.title?.trim() || parsed.suggestedTitle,
     author: options.author ?? '',
+    ...(tocTitle ? { tocTitle } : {}),
     language: options.language ?? 'ko',
     paragraphs: reflow(parsed.rawText, options.reflow ?? DEFAULT_REFLOW_OPTIONS),
     cover: options.cover ?? { kind: 'none' },

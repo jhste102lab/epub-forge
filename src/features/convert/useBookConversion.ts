@@ -57,6 +57,7 @@ export function useBookConversion(settings: ConversionSettings): BookConversion 
       return {
         title: draft.title,
         author: draft.author,
+        tocTitle: draft.tocTitle,
         reflow: settings.reflow,
         style: settings.style,
         cover: await resolveCover(draft),

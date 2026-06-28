@@ -33,6 +33,7 @@ export function useBookDrafts(): BookDrafts {
         file,
         sourceName: file.name,
         title: titleFromFileName(file.name),
+        tocTitle: '',
         author: '',
         cover: { kind: 'auto' },
       }),

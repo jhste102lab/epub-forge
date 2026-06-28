@@ -51,6 +51,8 @@ export default {
     coverAuto: '自动封面',
     coverReset: '删除封面',
     title: '标题',
+    tocTitle: '目录标题',
+    tocTitlePlaceholder: '留空则使用标题',
     author: '作者',
     authorPlaceholder: '（可选）',
     remove: '移除',

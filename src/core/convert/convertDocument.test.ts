@@ -23,6 +23,18 @@ describe('convertDocument', () => {
     expect(chapter).toContain('<p>둘째 문단.</p>');
   });
 
+  it('passes a separate TOC title without changing EPUB metadata Title', async () => {
+    const result = await convertDocument(txtFile('raw.txt', '본문'), {
+      title: '메타 제목',
+      tocTitle: '차례 제목',
+    });
+    const archive = unzipSync(result.bytes);
+    const opf = strFromU8(archive['OEBPS/content.opf']);
+    const nav = strFromU8(archive['OEBPS/nav.xhtml']);
+    expect(opf).toContain('<dc:title>메타 제목</dc:title>');
+    expect(nav).toContain('>차례 제목</a>');
+  });
+
   it('lets an explicit Title and author override the derived ones', async () => {
     const result = await convertDocument(txtFile('raw.txt', '본문'), {
       title: '새 제목',

@@ -554,7 +554,7 @@ body {
 
 .book-row__fields {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: minmax(10rem, 1.35fr) minmax(8rem, 1fr) minmax(8rem, 0.9fr);
   gap: 0.75rem;
 }
 

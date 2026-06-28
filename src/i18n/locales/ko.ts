@@ -57,6 +57,8 @@ export default {
     coverAuto: '자동 표지',
     coverReset: '표지 삭제',
     title: '제목',
+    tocTitle: '대표 차례',
+    tocTitlePlaceholder: '비우면 제목 사용',
     author: '저자',
     authorPlaceholder: '(선택)',
     remove: '제거',

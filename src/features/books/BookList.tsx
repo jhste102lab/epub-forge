@@ -70,6 +70,7 @@ function BookRow({
 }: BookRowProps): JSX.Element {
   const { t } = useTranslation();
   const titleId = useId();
+  const tocTitleId = useId();
   const authorId = useId();
   const coverInputRef = useRef<HTMLInputElement>(null);
   const hasImage = draft.cover.kind === 'image';
@@ -126,6 +127,17 @@ function BookRow({
               value={draft.title}
               disabled={disabled}
               onChange={(e) => onPatch(draft.id, { title: e.target.value })}
+            />
+          </label>
+          <label className="book-row__field" htmlFor={tocTitleId}>
+            <span>{t('book.tocTitle')}</span>
+            <input
+              id={tocTitleId}
+              type="text"
+              value={draft.tocTitle}
+              disabled={disabled}
+              placeholder={t('book.tocTitlePlaceholder')}
+              onChange={(e) => onPatch(draft.id, { tocTitle: e.target.value })}
             />
           </label>
           <label className="book-row__field" htmlFor={authorId}>

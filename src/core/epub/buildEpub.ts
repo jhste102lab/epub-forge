@@ -12,12 +12,6 @@ const FONT_PATH = 'fonts/body.otf';
 
 export type { EmbeddedFont } from './styleCss';
 
-/**
- * Build a valid EPUB3 by hand so the
- * Title, the single TOC entry, and the Cover are fully under our control.
- * Pure: identical inputs (plus the supplied `modified` time) yield identical
- * bytes. Returns the raw `.epub` archive.
- */
 export function buildEpub(
   book: Book,
   style: Style,
@@ -29,7 +23,6 @@ export function buildEpub(
   const chapters = splitParagraphsIntoChapters(book.paragraphs);
 
   const files: Zippable = {
-    // The mimetype must be the first entry and stored uncompressed.
     mimetype: [strToU8('application/epub+zip'), { level: 0 }],
     'META-INF/container.xml': strToU8(containerXml()),
     [`${CONTENT_DIR}/${CSS_PATH}`]: strToU8(styleCss(style, embeddedFont)),
@@ -214,11 +207,12 @@ function renderParagraph(paragraph: string): string {
 
 function chapterXhtml(book: Book, chapter: ChapterEntry): string {
   const body = chapter.paragraphs.map(renderParagraph).join('\n');
+  const tocTitle = tableOfContentsTitle(book);
   return xhtmlDocument(
     book,
     book.title,
     chapter.id === 'chapter1'
-      ? `    <h1 class="chapter-title">${escapeXml(book.title)}</h1>
+      ? `    <h1 class="chapter-title">${escapeXml(tocTitle)}</h1>
 ${body}`
       : body,
   );
@@ -269,12 +263,17 @@ function navXhtml(book: Book, chapters: readonly ChapterEntry[]): string {
   <body>
     <nav epub:type="toc" id="toc">
       <ol>
-        <li><a href="${chapters[0].path}">${escapeXml(book.title)}</a></li>
+        <li><a href="${chapters[0].path}">${escapeXml(tableOfContentsTitle(book))}</a></li>
       </ol>
     </nav>
   </body>
 </html>
 `;
+}
+
+function tableOfContentsTitle(book: Book): string {
+  const tocTitle = book.tocTitle?.trim();
+  return tocTitle && tocTitle.length > 0 ? tocTitle : book.title;
 }
 
 function tocNcx(book: Book, identifier: string, chapters: readonly ChapterEntry[]): string {
@@ -289,7 +288,7 @@ function tocNcx(book: Book, identifier: string, chapters: readonly ChapterEntry[
   <docTitle><text>${escapeXml(book.title)}</text></docTitle>
   <navMap>
     <navPoint id="navpoint-1" playOrder="1">
-      <navLabel><text>${escapeXml(book.title)}</text></navLabel>
+      <navLabel><text>${escapeXml(tableOfContentsTitle(book))}</text></navLabel>
       <content src="${chapters[0].path}"/>
     </navPoint>
   </navMap>

@@ -43,6 +43,19 @@ describe('buildEpub', () => {
     expect(opf).toContain('urn:uuid:11111111-1111-4111-8111-111111111111');
   });
 
+  it('uses an optional TOC title for the table of contents and first heading only', () => {
+    const files = unzip(makeBook({ tocTitle: '본문 차례' }));
+    const opf = files['OEBPS/content.opf'];
+    const nav = files['OEBPS/nav.xhtml'];
+    const ncx = files['OEBPS/toc.ncx'];
+    const chapter = files['OEBPS/chapter-0001.xhtml'];
+
+    expect(opf).toContain('<dc:title>홍길동전</dc:title>');
+    expect(nav).toContain('>본문 차례</a>');
+    expect(ncx).toContain('<navLabel><text>본문 차례</text></navLabel>');
+    expect(chapter).toContain('<h1 class="chapter-title">본문 차례</h1>');
+  });
+
   it('has exactly one TOC entry equal to the Title', () => {
     const nav = unzip(makeBook())['OEBPS/nav.xhtml'];
     const entries = nav.match(/<li>/g) ?? [];
