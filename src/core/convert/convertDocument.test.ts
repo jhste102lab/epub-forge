@@ -1,10 +1,12 @@
-import { strFromU8, unzipSync } from 'fflate';
+import { strFromU8, strToU8, unzipSync, zipSync } from 'fflate';
 import { describe, expect, it } from 'vitest';
-import type { FileLike } from '../parse/types';
+import { expandZip } from '../intake/expandZip';
+import type { BookSource } from '../types';
 import { UnsupportedFormatError } from '../parse/types';
 import { convertDocument, safeFileName } from './convertDocument';
 
-const txtFile = (name: string, text: string): FileLike => ({
+const txtFile = (name: string, text: string): BookSource => ({
+  kind: 'document',
   name,
   bytes: new TextEncoder().encode(text),
 });
@@ -43,6 +45,34 @@ describe('convertDocument', () => {
     const opf = strFromU8(unzipSync(result.bytes)['OEBPS/content.opf']);
     expect(result.title).toBe('새 제목');
     expect(opf).toContain('<dc:creator>저자</dc:creator>');
+  });
+
+  it('converts document ZIP entries independently with basename-derived titles', async () => {
+    const sources = expandZip({
+      name: 'documents.zip',
+      bytes: zipSync({
+        'a/book.txt': strToU8('First document.'),
+        'b/book.txt': strToU8('Second document.'),
+      }),
+    }).files;
+    const results = await Promise.all(sources.map((source) => convertDocument(source)));
+    expect(results.map((result) => result.title)).toEqual(['book', 'book']);
+    expect(strFromU8(unzipSync(results[0].bytes)['OEBPS/chapter-0001.xhtml'])).toContain(
+      '<p>First document.</p>',
+    );
+    expect(strFromU8(unzipSync(results[1].bytes)['OEBPS/chapter-0001.xhtml'])).toContain(
+      '<p>Second document.</p>',
+    );
+  });
+
+  it('reports corrupt image page names before attempting to package an EPUB', async () => {
+    await expect(
+      convertDocument({
+        kind: 'image-zip',
+        name: 'pages.zip',
+        bytes: zipSync({ 'folder/page.jpg': strToU8('broken') }),
+      }),
+    ).rejects.toThrow('folder/page.jpg');
   });
 
   it('rejects unsupported formats', async () => {

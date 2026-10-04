@@ -60,3 +60,22 @@ div.cover img {
 }
 `;
 }
+
+/** Image books deliberately do not inherit any text typography or paragraph spacing. */
+export const IMAGE_STYLE_CSS = `html, body, section, .image-page, .cover {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+img {
+  display: block;
+  margin: 0 auto;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+`;

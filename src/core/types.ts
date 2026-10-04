@@ -1,3 +1,5 @@
+import type { FileLike } from './parse/types';
+
 /**
  * Core domain types shared by the parser, conversion, and EPUB writer layers.
  * This module is framework-agnostic and pure — no DOM, no React.
@@ -27,11 +29,21 @@ export interface Style {
   readonly indentEm: number;
 }
 
-/**
- * One output EPUB. There is a strict one-to-one relationship with a Document.
- * A Book carries its own Title, author, optional display title for the table of
- * contents, and Cover; its body is a flat list of paragraphs.
- */
+/** A document or a complete image archive, each producing one output EPUB. */
+export type BookSource = FileLike & { readonly kind: 'document' | 'image-zip' };
+
+/** An original image page; source paths remain distinct across archive folders. */
+export interface ImagePage {
+  readonly sourcePath: string;
+  readonly bytes: Uint8Array;
+  readonly mediaType: 'image/jpeg' | 'image/png' | 'image/webp';
+}
+
+export type BookBody =
+  | { readonly kind: 'text'; readonly paragraphs: readonly string[] }
+  | { readonly kind: 'images'; readonly pages: readonly ImagePage[] };
+
+/** One output EPUB with its own metadata, cover, and text or image body. */
 export interface Book {
   readonly id: string;
   readonly title: string;
@@ -40,7 +52,7 @@ export interface Book {
   readonly tocTitle?: string;
   /** BCP-47 language tag, e.g. "ko". */
   readonly language: string;
-  readonly paragraphs: readonly string[];
+  readonly body: BookBody;
   readonly cover: Cover;
 }
 

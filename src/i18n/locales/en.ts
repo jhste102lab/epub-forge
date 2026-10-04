@@ -12,7 +12,7 @@ export default {
   },
   intake: {
     title: 'Drag files here, or click to choose',
-    hint: 'Converts txt · docx · hwpx · hwp, or a zip of them, to EPUB.',
+    hint: 'Converts txt · docx · hwpx · hwp, document ZIPs, or image ZIPs (JPEG · PNG · WebP) to EPUB. Each image ZIP becomes one book.',
   },
   reflow: {
     legend: 'Paragraphs',
@@ -56,6 +56,10 @@ export default {
     cover: 'Choose cover image',
     coverAuto: 'Auto cover',
     coverReset: 'Remove cover',
+    coverHint:
+      'Choose or drop a cover image. Focus the cover with Tab (or click, then cancel the picker), then Cmd/Ctrl+V to paste an image.',
+    coverInvalid: 'Use a readable PNG, JPEG, WebP, GIF, BMP, or AVIF image file, not an image URL.',
+    coverMultiple: 'Choose, drop, or paste one cover image at a time.',
     title: 'Title',
     tocTitle: 'TOC title',
     tocTitlePlaceholder: 'Uses title if blank',

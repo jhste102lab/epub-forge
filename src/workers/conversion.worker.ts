@@ -1,6 +1,6 @@
 import * as Comlink from 'comlink';
 import hbSubsetWasmUrl from 'harfbuzzjs/hb-subset.wasm?url';
-import { convertDocument } from '../core/convert/convertDocument';
+import { convertDocument, type ConvertResult } from '../core/convert/convertDocument';
 import { createSubsetter, type Subsetter } from '../core/fonts/subset';
 import type { ConversionApi, FontAsset, WorkerConvertOptions } from './conversion.api';
 
@@ -35,12 +35,17 @@ function fetchFontSource(asset: FontAsset): Promise<Uint8Array> {
 const api: ConversionApi = {
   async convert(file, options: WorkerConvertOptions = {}) {
     const { font, ...rest } = options;
-    if (!font) return convertDocument(file, rest);
-    const [sourceBytes, subsetter] = await Promise.all([fetchFontSource(font), getSubsetter()]);
-    return convertDocument(file, {
-      ...rest,
-      embedFont: { family: font.family, sourceBytes, subsetter },
-    });
+    let result: ConvertResult;
+    if (!font || file.kind === 'image-zip') {
+      result = await convertDocument(file, rest);
+    } else {
+      const [sourceBytes, subsetter] = await Promise.all([fetchFontSource(font), getSubsetter()]);
+      result = await convertDocument(file, {
+        ...rest,
+        embedFont: { family: font.family, sourceBytes, subsetter },
+      });
+    }
+    return Comlink.transfer(result, [result.bytes.buffer as ArrayBuffer]);
   },
 };
 

@@ -57,22 +57,30 @@ export function useBookDrafts(): BookDrafts {
   }, []);
 
   const setCover = useCallback(async (id: string, file: File) => {
-    const image = await normalizeCoverImage(file);
-    setDrafts((prev) =>
-      prev.map((draft) => {
-        if (draft.id !== id) return draft;
-        revokeCover(draft.cover);
-        return { ...draft, cover: { kind: 'image', ...image } };
-      }),
-    );
+    try {
+      const image = await normalizeCoverImage(file);
+      setDrafts((prev) =>
+        prev.map((draft) => {
+          if (draft.id !== id) return draft;
+          revokeCover(draft.cover);
+          return { ...draft, cover: { kind: 'image', ...image }, coverError: undefined };
+        }),
+      );
+    } catch {
+      setDrafts((prev) =>
+        prev.map((draft) =>
+          draft.id === id ? { ...draft, coverError: 'book.coverInvalid' } : draft,
+        ),
+      );
+    }
   }, []);
 
   const clearCover = useCallback((id: string) => {
     setDrafts((prev) =>
       prev.map((draft) => {
-        if (draft.id !== id || draft.cover.kind !== 'image') return draft;
+        if (draft.id !== id) return draft;
         revokeCover(draft.cover);
-        return { ...draft, cover: { kind: 'auto' } };
+        return { ...draft, cover: { kind: 'auto' }, coverError: undefined };
       }),
     );
   }, []);

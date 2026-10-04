@@ -12,7 +12,7 @@ export default {
   },
   intake: {
     title: '파일을 여기에 끌어다 놓거나 눌러서 선택하세요',
-    hint: 'txt · docx · hwpx · hwp, 또는 이들을 담은 zip 파일을 EPUB으로 변환합니다.',
+    hint: 'txt · docx · hwpx · hwp, 문서 ZIP 또는 이미지 ZIP(JPEG · PNG · WebP)을 EPUB으로 변환합니다. 이미지 ZIP 하나가 책 한 권이 됩니다.',
   },
   reflow: {
     legend: '문단 정리',
@@ -56,6 +56,11 @@ export default {
     cover: '표지 이미지 선택',
     coverAuto: '자동 표지',
     coverReset: '표지 삭제',
+    coverHint:
+      '표지 이미지를 선택하거나 끌어다 놓으세요. Tab으로 표지에 초점을 맞추거나 클릭 후 선택 창을 닫고, Cmd/Ctrl+V로 이미지를 붙여넣으세요.',
+    coverInvalid:
+      '이미지 주소가 아닌, 읽을 수 있는 PNG · JPEG · WebP · GIF · BMP · AVIF 이미지 파일을 사용하세요.',
+    coverMultiple: '표지 이미지는 한 번에 하나만 선택·드롭·붙여넣기 해 주세요.',
     title: '제목',
     tocTitle: '대표 차례',
     tocTitlePlaceholder: '비우면 제목 사용',

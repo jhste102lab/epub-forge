@@ -1,5 +1,5 @@
 import type { ConvertOptions, ConvertResult } from '../core/convert/convertDocument';
-import type { FileLike } from '../core/parse/types';
+import type { BookSource } from '../core/types';
 
 /** The selected font to embed, identified by family + the source asset path. */
 export interface FontAsset {
@@ -15,5 +15,5 @@ export type WorkerConvertOptions = Omit<ConvertOptions, 'embedFont'> & {
 
 /** The contract exposed by the conversion worker and consumed via Comlink. */
 export interface ConversionApi {
-  convert(file: FileLike, options?: WorkerConvertOptions): Promise<ConvertResult>;
+  convert(file: BookSource, options?: WorkerConvertOptions): Promise<ConvertResult>;
 }

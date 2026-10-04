@@ -53,7 +53,7 @@ export function useBookConversion(settings: ConversionSettings): BookConversion 
 
   const buildRequest = useCallback(
     async (draft: BookDraft): Promise<WorkerConvertOptions> => {
-      const font = fontOption(settings.fontId);
+      const font = draft.file.kind === 'document' ? fontOption(settings.fontId) : undefined;
       return {
         title: draft.title,
         author: draft.author,
@@ -61,7 +61,7 @@ export function useBookConversion(settings: ConversionSettings): BookConversion 
         reflow: settings.reflow,
         style: settings.style,
         cover: await resolveCover(draft),
-        font: { family: font.family, assetPath: font.assetPath },
+        ...(font ? { font: { family: font.family, assetPath: font.assetPath } } : {}),
       };
     },
     [settings.fontId, settings.reflow, settings.style],

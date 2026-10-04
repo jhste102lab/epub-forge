@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { strFromU8, unzipSync } from 'fflate';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { convertDocument } from '../convert/convertDocument';
-import type { FileLike } from '../parse/types';
+import type { BookSource } from '../types';
 import { createSubsetter, type Subsetter, usedCharacters } from './subset';
 
 const readBin = (path: string): Uint8Array => new Uint8Array(readFileSync(path));
@@ -45,7 +45,8 @@ describe('createSubsetter', () => {
 
 describe('convertDocument with font embedding', () => {
   it('embeds a sub-megabyte subset for a Korean Book', async () => {
-    const file: FileLike = {
+    const file: BookSource = {
+      kind: 'document',
       name: '소설.txt',
       bytes: new TextEncoder().encode('한국어 본문입니다.\n\n두 번째 문단도 있습니다.'),
     };

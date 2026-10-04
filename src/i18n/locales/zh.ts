@@ -11,7 +11,7 @@ export default {
   },
   intake: {
     title: '将文件拖到此处，或点击选择',
-    hint: '支持 txt · docx · hwpx · hwp，或包含它们的 zip，转换为 EPUB。',
+    hint: '将 txt · docx · hwpx · hwp、文档 ZIP 或图片 ZIP（JPEG · PNG · WebP）转换为 EPUB。每个图片 ZIP 生成一本书。',
   },
   reflow: {
     legend: '段落整理',
@@ -50,6 +50,10 @@ export default {
     cover: '选择封面图片',
     coverAuto: '自动封面',
     coverReset: '删除封面',
+    coverHint:
+      '选择或拖入封面图片。用 Tab 聚焦封面（或点击后关闭选择窗口），然后按 Cmd/Ctrl+V 粘贴图片。',
+    coverInvalid: '请使用可读取的 PNG · JPEG · WebP · GIF · BMP · AVIF 图片文件，而非图片网址。',
+    coverMultiple: '每次只能选择、拖入或粘贴一张封面图片。',
     title: '标题',
     tocTitle: '目录标题',
     tocTitlePlaceholder: '留空则使用标题',

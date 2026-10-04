@@ -1,6 +1,6 @@
 import { strToU8, zipSync, type Zippable } from 'fflate';
-import type { Book, Cover, Style } from '../types';
-import { styleCss, type EmbeddedFont } from './styleCss';
+import type { Book, Cover, ImagePage, Style } from '../types';
+import { IMAGE_STYLE_CSS, styleCss, type EmbeddedFont } from './styleCss';
 import { escapeXml, epubTimestamp } from './xml';
 
 const CONTENT_DIR = 'OEBPS';
@@ -20,47 +20,80 @@ export function buildEpub(
 ): Uint8Array {
   const identifier = `urn:uuid:${book.id}`;
   const coverImage = book.cover.kind === 'image' ? coverImageEntry(book.cover) : undefined;
-  const chapters = splitParagraphsIntoChapters(book.paragraphs);
+  const font = book.body.kind === 'text' ? embeddedFont : undefined;
+  const chapters: ChapterEntry[] =
+    book.body.kind === 'text'
+      ? splitParagraphsIntoChapters(book.body.paragraphs)
+      : book.body.pages.map((image, index) => {
+          const number = (index + 1).toString().padStart(4, '0');
+          return {
+            kind: 'image',
+            id: `page${index + 1}`,
+            path: `page-${number}.xhtml`,
+            imageId: `image${index + 1}`,
+            imagePath: `images/page-${number}.${extensionForMediaType(image.mediaType)}`,
+            image,
+          };
+        });
+  if (chapters.length === 0) throw new Error('An image book must contain at least one page.');
 
   const files: Zippable = {
     mimetype: [strToU8('application/epub+zip'), { level: 0 }],
     'META-INF/container.xml': strToU8(containerXml()),
-    [`${CONTENT_DIR}/${CSS_PATH}`]: strToU8(styleCss(style, embeddedFont)),
+    [`${CONTENT_DIR}/${CSS_PATH}`]: strToU8(
+      book.body.kind === 'images' ? IMAGE_STYLE_CSS : styleCss(style, font),
+    ),
     [`${CONTENT_DIR}/nav.xhtml`]: strToU8(navXhtml(book, chapters)),
     [`${CONTENT_DIR}/toc.ncx`]: strToU8(tocNcx(book, identifier, chapters)),
     [`${CONTENT_DIR}/content.opf`]: strToU8(
-      contentOpf(
-        book,
-        identifier,
-        modified,
-        chapters,
-        coverImage?.fileName,
-        embeddedFont !== undefined,
-      ),
+      contentOpf(book, identifier, modified, chapters, coverImage?.fileName, font !== undefined),
     ),
   };
 
   for (const chapter of chapters) {
-    files[`${CONTENT_DIR}/${chapter.path}`] = strToU8(chapterXhtml(book, chapter));
+    files[`${CONTENT_DIR}/${chapter.path}`] = strToU8(
+      chapter.kind === 'image'
+        ? xhtmlDocument(
+            book,
+            book.title,
+            `    <div class="image-page"><img src="${chapter.imagePath}" alt="${escapeXml(chapter.image.sourcePath)}"/></div>`,
+          )
+        : chapterXhtml(book, chapter),
+    );
+    if (chapter.kind === 'image') {
+      files[`${CONTENT_DIR}/${chapter.imagePath}`] = [chapter.image.bytes, { level: 0 }];
+    }
   }
 
   if (coverImage) {
-    files[`${CONTENT_DIR}/${coverImage.fileName}`] = coverImage.bytes;
+    files[`${CONTENT_DIR}/${coverImage.fileName}`] = [coverImage.bytes, { level: 0 }];
     files[`${CONTENT_DIR}/${COVER_PATH}`] = strToU8(coverXhtml(book, coverImage.fileName));
   }
 
-  if (embeddedFont) {
-    files[`${CONTENT_DIR}/${FONT_PATH}`] = embeddedFont.bytes;
+  if (font) {
+    files[`${CONTENT_DIR}/${FONT_PATH}`] = font.bytes;
   }
 
   return zipSync(files, { level: 6 });
 }
 
-interface ChapterEntry {
+interface TextChapterEntry {
+  readonly kind: 'text';
   readonly id: string;
   readonly path: string;
   readonly paragraphs: readonly string[];
 }
+
+type ChapterEntry =
+  | TextChapterEntry
+  | {
+      readonly kind: 'image';
+      readonly id: string;
+      readonly path: string;
+      readonly imageId: string;
+      readonly imagePath: string;
+      readonly image: ImagePage;
+    };
 
 interface CoverImageEntry {
   readonly fileName: string;
@@ -113,6 +146,9 @@ function contentOpf(
     ? `
     <meta name="cover" content="${COVER_IMAGE_ID}"/>`
     : '';
+  const creatorMetadata = book.author.trim()
+    ? `\n    <dc:creator>${escapeXml(book.author)}</dc:creator>`
+    : '';
   const coverManifestItems = coverFileName
     ? `
     <item id="${COVER_IMAGE_ID}" href="${coverFileName}" media-type="${mediaTypeForFile(coverFileName)}" properties="cover-image"/>
@@ -122,7 +158,7 @@ function contentOpf(
     .map(
       (chapter) =>
         `
-    <item id="${chapter.id}" href="${chapter.path}" media-type="application/xhtml+xml"/>`,
+    <item id="${chapter.id}" href="${chapter.path}" media-type="application/xhtml+xml"/>${chapter.kind === 'image' ? `\n    <item id="${chapter.imageId}" href="${chapter.imagePath}" media-type="${chapter.image.mediaType}"/>` : ''}`,
     )
     .join('');
   const fontManifestItem = hasEmbeddedFont
@@ -137,8 +173,7 @@ function contentOpf(
 <package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="bookid" xml:lang="${escapeXml(book.language)}">
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
     <dc:identifier id="bookid">${escapeXml(identifier)}</dc:identifier>
-    <dc:title>${escapeXml(book.title)}</dc:title>
-    <dc:creator>${escapeXml(book.author)}</dc:creator>
+    <dc:title>${escapeXml(book.title)}</dc:title>${creatorMetadata}
     <dc:language>${escapeXml(book.language)}</dc:language>
     <meta property="dcterms:modified">${epubTimestamp(modified)}</meta>${coverMetadata}
   </metadata>
@@ -169,7 +204,7 @@ function mediaTypeForFile(fileName: string): string {
   }
 }
 
-function splitParagraphsIntoChapters(paragraphs: readonly string[]): ChapterEntry[] {
+function splitParagraphsIntoChapters(paragraphs: readonly string[]): TextChapterEntry[] {
   const chapters: string[][] = [];
   let current: string[] = [];
   let currentBytes = 0;
@@ -192,6 +227,7 @@ function splitParagraphsIntoChapters(paragraphs: readonly string[]): ChapterEntr
   return chapters.map((chapterParagraphs, index) => {
     const chapterNo = index + 1;
     return {
+      kind: 'text',
       id: `chapter${chapterNo}`,
       path: `chapter-${chapterNo.toString().padStart(4, '0')}.xhtml`,
       paragraphs: chapterParagraphs,
@@ -205,7 +241,7 @@ function renderParagraph(paragraph: string): string {
     : `    <p>${escapeXml(paragraph)}</p>`;
 }
 
-function chapterXhtml(book: Book, chapter: ChapterEntry): string {
+function chapterXhtml(book: Book, chapter: TextChapterEntry): string {
   const body = chapter.paragraphs.map(renderParagraph).join('\n');
   const tocTitle = tableOfContentsTitle(book);
   return xhtmlDocument(

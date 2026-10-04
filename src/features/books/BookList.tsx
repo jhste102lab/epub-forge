@@ -1,4 +1,4 @@
-import { useId, useRef } from 'react';
+import { useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { BookDraft, BookDraftPatch } from './types';
 
@@ -72,18 +72,67 @@ function BookRow({
   const titleId = useId();
   const tocTitleId = useId();
   const authorId = useId();
+  const coverHintId = useId();
   const coverInputRef = useRef<HTMLInputElement>(null);
   const hasImage = draft.cover.kind === 'image';
+  const [dragging, setDragging] = useState(false);
+  const [coverError, setCoverError] = useState<string | null>(null);
+  const coverDisabled = disabled || busy;
+  const error = coverError ?? draft.coverError;
+
+  const setCover = (files: readonly File[]): void => {
+    if (coverDisabled) return;
+    if (files.length !== 1) {
+      setCoverError(files.length > 1 ? 'book.coverMultiple' : 'book.coverInvalid');
+      return;
+    }
+    const file = files[0];
+    if (!file || !/^image\/(?:png|jpeg|webp|gif|bmp|avif)$/i.test(file.type)) {
+      setCoverError('book.coverInvalid');
+      return;
+    }
+    setCoverError(null);
+    onSetCover(draft.id, file);
+  };
 
   return (
     <li className="book-row">
-      <div className="book-row__cover">
+      <div
+        className="book-row__cover"
+        onDragOver={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          event.dataTransfer.dropEffect = coverDisabled ? 'none' : 'copy';
+          setDragging(!coverDisabled);
+        }}
+        onDragLeave={(event) => {
+          event.stopPropagation();
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDragging(false);
+        }}
+        onDrop={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          setDragging(false);
+          setCover(Array.from(event.dataTransfer.files));
+        }}
+      >
         <button
           type="button"
-          className="cover-thumb"
-          disabled={disabled}
-          onClick={() => coverInputRef.current?.click()}
+          className={`cover-thumb${dragging && !coverDisabled ? ' cover-thumb--active' : ''}`}
+          disabled={coverDisabled}
+          onClick={(event) => {
+            event.currentTarget.focus();
+            coverInputRef.current?.click();
+          }}
+          onPaste={(event) => {
+            // Text and URLs remain ordinary paste; only clipboard files target this cover.
+            if (event.clipboardData.files.length === 0) return;
+            event.preventDefault();
+            event.stopPropagation();
+            setCover(Array.from(event.clipboardData.files));
+          }}
           aria-label={t('book.cover')}
+          aria-describedby={coverHintId}
         >
           {draft.cover.kind === 'image' ? (
             <img src={draft.cover.previewUrl} alt="" />
@@ -95,8 +144,11 @@ function BookRow({
           <button
             type="button"
             className="cover-thumb__reset"
-            disabled={disabled}
-            onClick={() => onResetCover(draft.id)}
+            disabled={coverDisabled}
+            onClick={() => {
+              setCoverError(null);
+              onResetCover(draft.id);
+            }}
           >
             {t('book.coverReset')}
           </button>
@@ -104,11 +156,12 @@ function BookRow({
         <input
           ref={coverInputRef}
           type="file"
-          accept="image/*"
+          accept="image/png,image/jpeg,image/webp,image/gif,image/bmp,image/avif"
+          disabled={coverDisabled}
           hidden
           onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) onSetCover(draft.id, file);
+            const files = Array.from(e.target.files ?? []);
+            if (files.length > 0) setCover(files);
             e.target.value = '';
           }}
         />
@@ -118,6 +171,14 @@ function BookRow({
         <p className="book-row__source" title={draft.sourceName}>
           {draft.sourceName}
         </p>
+        <p id={coverHintId} className="book-row__cover-hint">
+          {t('book.coverHint')}
+        </p>
+        {error && (
+          <p className="book-row__cover-error" role="alert">
+            {t(error)}
+          </p>
+        )}
         <div className="book-row__fields">
           <label className="book-row__field" htmlFor={titleId}>
             <span>{t('book.title')}</span>

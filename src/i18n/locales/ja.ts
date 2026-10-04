@@ -12,7 +12,7 @@ export default {
   },
   intake: {
     title: 'ファイルをここにドラッグ、またはクリックして選択',
-    hint: 'txt・docx・hwpx・hwp、またはそれらを含む zip を EPUB に変換します。',
+    hint: 'txt・docx・hwpx・hwp、文書 ZIP、画像 ZIP（JPEG・PNG・WebP）を EPUB に変換します。画像 ZIP 一つが一冊になります。',
   },
   reflow: {
     legend: '段落の整形',
@@ -56,6 +56,11 @@ export default {
     cover: '表紙画像を選択',
     coverAuto: '自動表紙',
     coverReset: '表紙を削除',
+    coverHint:
+      '表紙画像を選択またはドロップ。Tab で表紙にフォーカス（またはクリックして選択画面を閉じる）し、Cmd/Ctrl+V で画像を貼り付けます。',
+    coverInvalid:
+      '画像 URL ではなく、読み込める PNG・JPEG・WebP・GIF・BMP・AVIF 画像ファイルを使用してください。',
+    coverMultiple: '表紙画像は一度に一つだけ選択・ドロップ・貼り付けしてください。',
     title: 'タイトル',
     tocTitle: '目次タイトル',
     tocTitlePlaceholder: '空ならタイトルを使用',

@@ -8,6 +8,7 @@ export default defineConfig({
   workers: process.env['CI'] !== undefined ? 1 : undefined,
   reporter: process.env['CI'] !== undefined ? 'dot' : 'list',
   use: {
+    baseURL: 'http://localhost:5173',
     trace: 'on-first-retry',
   },
   projects: [

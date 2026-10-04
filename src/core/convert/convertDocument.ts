@@ -1,10 +1,11 @@
 import { type EmbeddedFont, buildEpub } from '../epub/buildEpub';
 import { type Subsetter, usedCharacters } from '../fonts/subset';
 import { uuid } from '../id';
+import { readImageZip } from '../intake/expandZip';
 import { resolveParser } from '../parse/registry';
-import type { FileLike } from '../parse/types';
+import { titleFromFileName } from '../parse/types';
 import { DEFAULT_REFLOW_OPTIONS, reflow, type ReflowOptions } from '../reflow/reflow';
-import type { Book, Cover, Style } from '../types';
+import type { Book, BookBody, BookSource, Cover, ImagePage, Style } from '../types';
 import { DEFAULT_STYLE } from '../types';
 
 /**
@@ -36,23 +37,35 @@ export interface ConvertResult {
 }
 
 /**
- * The conversion pipeline as a pure-ish function (its only impurity is a random
- * id and the current time): a Document plus settings in, EPUB bytes out. This
- * is the highest test seam — feed known inputs, unzip the result, assert.
+ * One source plus settings in, EPUB bytes out. Image archives are decoded on
+ * the worker solely for validation. All image bodies keep their original bytes
+ * and resolution and skip reflow and font subsetting.
  */
 export async function convertDocument(
-  file: FileLike,
+  file: BookSource,
   options: ConvertOptions = {},
 ): Promise<ConvertResult> {
-  const parsed = await resolveParser(file).parse(file);
+  let body: BookBody;
+  let suggestedTitle: string;
+  if (file.kind === 'image-zip') {
+    body = { kind: 'images', pages: await imagePages(file) };
+    suggestedTitle = titleFromFileName(file.name);
+  } else {
+    const parsed = await resolveParser(file).parse(file);
+    body = {
+      kind: 'text',
+      paragraphs: reflow(parsed.rawText, options.reflow ?? DEFAULT_REFLOW_OPTIONS),
+    };
+    suggestedTitle = parsed.suggestedTitle;
+  }
   const tocTitle = options.tocTitle?.trim();
   const book: Book = {
     id: uuid(),
-    title: options.title?.trim() || parsed.suggestedTitle,
+    title: options.title?.trim() || suggestedTitle,
     author: options.author ?? '',
     ...(tocTitle ? { tocTitle } : {}),
     language: options.language ?? 'ko',
-    paragraphs: reflow(parsed.rawText, options.reflow ?? DEFAULT_REFLOW_OPTIONS),
+    body,
     cover: options.cover ?? { kind: 'none' },
   };
 
@@ -62,10 +75,30 @@ export async function convertDocument(
 }
 
 function maybeEmbedFont(book: Book, source: EmbedFontSource | undefined): EmbeddedFont | undefined {
-  if (!source) return undefined;
-  const text = usedCharacters([book.title, book.author, ...book.paragraphs]);
+  if (!source || book.body.kind !== 'text') return undefined;
+  const text = usedCharacters([book.title, book.author, ...book.body.paragraphs]);
   const bytes = source.subsetter(source.sourceBytes, text);
   return { family: source.family, bytes };
+}
+
+async function imagePages(file: BookSource): Promise<ImagePage[]> {
+  const pages = readImageZip(file);
+  for (const page of pages) {
+    let bitmap: ImageBitmap | undefined;
+    try {
+      // Decode only to reject corrupt pages; the EPUB keeps the source bytes.
+      bitmap = await createImageBitmap(
+        new Blob([page.bytes as Uint8Array<ArrayBuffer>], { type: page.mediaType }),
+      );
+      if (bitmap.width === 0 || bitmap.height === 0) throw new Error('Empty image');
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : String(error);
+      throw new Error(`Invalid image page "${page.sourcePath}" in "${file.name}": ${reason}`);
+    } finally {
+      bitmap?.close();
+    }
+  }
+  return pages;
 }
 
 const INVALID_FILENAME_CHARS = /["*/:<>?\\|]/g;
