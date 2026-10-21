@@ -82,15 +82,16 @@ function maybeEmbedFont(book: Book, source: EmbedFontSource | undefined): Embedd
 }
 
 async function imagePages(file: BookSource): Promise<ImagePage[]> {
-  const pages = readImageZip(file);
-  for (const page of pages) {
+  const pages: ImagePage[] = [];
+  for (const page of readImageZip(file)) {
     let bitmap: ImageBitmap | undefined;
     try {
-      // Decode only to reject corrupt pages; the EPUB keeps the source bytes.
+      // Decode to reject corrupt pages and measure them; the EPUB keeps the source bytes.
       bitmap = await createImageBitmap(
         new Blob([page.bytes as Uint8Array<ArrayBuffer>], { type: page.mediaType }),
       );
       if (bitmap.width === 0 || bitmap.height === 0) throw new Error('Empty image');
+      pages.push({ ...page, width: bitmap.width, height: bitmap.height });
     } catch (error) {
       const reason = error instanceof Error ? error.message : String(error);
       throw new Error(`Invalid image page "${page.sourcePath}" in "${file.name}": ${reason}`);

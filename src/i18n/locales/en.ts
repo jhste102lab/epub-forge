@@ -12,7 +12,7 @@ export default {
   },
   intake: {
     title: 'Drag files here, or click to choose',
-    hint: 'Converts txt · docx · hwpx · hwp, document ZIPs, or image ZIPs (JPEG · PNG · WebP) to EPUB. Each image ZIP becomes one book.',
+    hint: 'Converts txt · docx · hwpx · hwp, document ZIPs, or image ZIPs (JPEG · PNG · WebP) to EPUB.',
   },
   reflow: {
     legend: 'Paragraphs',
@@ -54,10 +54,11 @@ export default {
   },
   book: {
     cover: 'Choose cover image',
-    coverAuto: 'Auto cover',
+    coverHint: 'Drop or\n⌘/Ctrl+V',
+    coverPaste: 'Clipboard',
+    coverFile: 'File',
     coverReset: 'Remove cover',
-    coverHint:
-      'Choose or drop a cover image. Focus the cover with Tab (or click, then cancel the picker), then Cmd/Ctrl+V to paste an image.',
+    coverClipboardError: 'No image found on the clipboard.',
     coverInvalid: 'Use a readable PNG, JPEG, WebP, GIF, BMP, or AVIF image file, not an image URL.',
     coverMultiple: 'Choose, drop, or paste one cover image at a time.',
     title: 'Title',

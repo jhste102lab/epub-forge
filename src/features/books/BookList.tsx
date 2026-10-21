@@ -95,6 +95,21 @@ function BookRow({
     onSetCover(draft.id, file);
   };
 
+  const pasteCover = async (): Promise<void> => {
+    try {
+      for (const item of await navigator.clipboard.read()) {
+        const type = item.types.find((candidate) => candidate.startsWith('image/'));
+        if (type) {
+          setCover([new File([await item.getType(type)], 'clipboard', { type })]);
+          return;
+        }
+      }
+    } catch {
+      // Denied permission, an insecure origin, or no Async Clipboard API all land here.
+    }
+    setCoverError('book.coverClipboardError');
+  };
+
   return (
     <li className="book-row">
       <div
@@ -132,14 +147,28 @@ function BookRow({
             setCover(Array.from(event.clipboardData.files));
           }}
           aria-label={t('book.cover')}
-          aria-describedby={coverHintId}
+          aria-describedby={hasImage ? undefined : coverHintId}
         >
           {draft.cover.kind === 'image' ? (
             <img src={draft.cover.previewUrl} alt="" />
           ) : (
-            <span className="cover-thumb__auto">{t('book.coverAuto')}</span>
+            <span id={coverHintId} className="cover-thumb__hint">
+              {t('book.coverHint')}
+            </span>
           )}
         </button>
+        <div className="cover-thumb__actions">
+          <button type="button" disabled={coverDisabled} onClick={() => void pasteCover()}>
+            {t('book.coverPaste')}
+          </button>
+          <button
+            type="button"
+            disabled={coverDisabled}
+            onClick={() => coverInputRef.current?.click()}
+          >
+            {t('book.coverFile')}
+          </button>
+        </div>
         {hasImage && (
           <button
             type="button"
@@ -170,9 +199,6 @@ function BookRow({
       <div className="book-row__main">
         <p className="book-row__source" title={draft.sourceName}>
           {draft.sourceName}
-        </p>
-        <p id={coverHintId} className="book-row__cover-hint">
-          {t('book.coverHint')}
         </p>
         {error && (
           <p className="book-row__cover-error" role="alert">

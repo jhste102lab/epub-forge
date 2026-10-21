@@ -42,6 +42,7 @@ describe('buildEpub', () => {
     expect(opf).toContain('<dc:creator>허균</dc:creator>');
     expect(opf).toContain('<dc:language>ko</dc:language>');
     expect(opf).toContain('urn:uuid:11111111-1111-4111-8111-111111111111');
+    expect(opf).not.toContain('rendition:layout');
   });
 
   it.each(['', ' \t '])('omits blank optional author metadata (%j)', (author) => {
@@ -147,7 +148,7 @@ describe('buildEpub', () => {
       }),
     });
     const book = makeBook({
-      body: { kind: 'images', pages },
+      body: { kind: 'images', pages: pages.map((page) => ({ ...page, width: 1, height: 1 })) },
       tocTitle: '이미지 본문',
       cover: { kind: 'image', bytes: png, mediaType: 'image/png' },
     });
@@ -183,14 +184,17 @@ describe('buildEpub', () => {
     ]);
     expect(opf).toContain('href="images/page-0001.webp" media-type="image/webp"');
     expect(opf).toContain('href="images/page-0002.png" media-type="image/png"');
-    expect(opf).not.toContain('rendition:layout');
+    expect(opf).toContain('<meta property="rendition:layout">pre-paginated</meta>');
+    expect(opf).toContain('<meta property="rendition:spread">landscape</meta>');
     for (const number of ['0001', '0002']) {
       const xhtml = strFromU8(archive[`OEBPS/page-${number}.xhtml`]);
       const imagePath = /<img src="([^"]+)"/.exec(xhtml)![1];
       expect(archive[`OEBPS/${imagePath}`]).toBeDefined();
+      expect(xhtml).toContain('<meta name="viewport" content="width=1, height=1"/>');
       expect(xhtml).not.toContain('<p>');
       expect(xhtml).not.toContain('<h1');
     }
+    expect(strFromU8(archive['OEBPS/cover.xhtml'])).toContain('<meta name="viewport"');
     const nav = strFromU8(archive['OEBPS/nav.xhtml']);
     const ncx = strFromU8(archive['OEBPS/toc.ncx']);
     expect(nav.match(/<li>/g)).toHaveLength(1);

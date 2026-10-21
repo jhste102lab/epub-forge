@@ -11,7 +11,7 @@ Repository: https://github.com/jhste102lab/epub-forge
 
 - Convert `.txt`, `.docx`, `.hwpx`, best-effort `.hwp`, and `.zip` bundles.
 - One input document or one image-only ZIP becomes one EPUB book; multiple ZIPs stay separate.
-- Edit each book's title, author, and cover. Choose a cover file, drop it on the thumbnail, or focus the thumbnail and paste an image.
+- Edit each book's title, author, and cover. Choose a cover file, drop it on the thumbnail, or use the Clipboard button or Cmd/Ctrl+V on the thumbnail to paste an image.
 - Apply batch-wide typography: font, size, margins, paragraph spacing, line height, indent, and reflow rules.
 - Rejoin hard-wrapped lines into readable paragraphs while preserving blank lines.
 - Embed a subset of the selected bundled font so the EPUB renders consistently on reader devices.
@@ -21,7 +21,7 @@ Repository: https://github.com/jhste102lab/epub-forge
 
 ### Image ZIPs
 
-Image ZIPs support JPEG, PNG, and WebP. Pages are naturally sorted by their full archive paths (`1`, `2`, `10`) and keep their original bytes and resolution. The actual image format is detected from its bytes, not its filename. Text typography and font embedding do not apply to image pages.
+Image ZIPs support JPEG, PNG, and WebP. Pages are naturally sorted by their full archive paths (`1`, `2`, `10`) and keep their original bytes and resolution. The actual image format is detected from its bytes, not its filename. Text typography and font embedding do not apply to image pages. Image books use fixed layout: one page in portrait, a two-page spread in landscape on readers that support spreads.
 
 ZIPs containing supported documents retain the existing one-document-per-book behavior and report skipped images. Other image formats are rejected rather than silently losing pages. WebP is an EPUB core image format, but older readers may not support it. A selected or generated cover is added before all original pages, including any cover already inside the ZIP.
 

@@ -54,7 +54,7 @@ test('cover input remains row-local and preserves text paste', async ({ page }) 
   const blue = await imageFile(page, '#0000ff');
 
   const chooser = page.waitForEvent('filechooser');
-  await first.locator('.cover-thumb').click();
+  await first.getByRole('button', { name: 'File', exact: true }).click();
   await (await chooser).setFiles(red);
   await expect(first.locator('.cover-thumb img')).toBeVisible();
   const firstPreview = await first
@@ -87,6 +87,23 @@ test('cover input remains row-local and preserves text paste', async ({ page }) 
     .locator('.cover-thumb img')
     .evaluate((image: HTMLImageElement) => image.src);
 
+  await page.evaluate(() => navigator.clipboard.writeText('not an image'));
+  await second.getByRole('button', { name: 'Clipboard', exact: true }).click();
+  await expect(second.getByRole('alert')).toHaveText('No image found on the clipboard.');
+  await expect(second.locator('.cover-thumb img')).toHaveAttribute('src', pastedPreview);
+  await page.evaluate(async (bytes) => {
+    await navigator.clipboard.write([
+      new ClipboardItem({ 'image/png': new Blob([new Uint8Array(bytes)], { type: 'image/png' }) }),
+    ]);
+  }, Array.from(red.buffer));
+  await second.getByRole('button', { name: 'Clipboard', exact: true }).click();
+  await expect(second.locator('.cover-thumb img')).not.toHaveAttribute('src', pastedPreview);
+  await expect(second.getByRole('alert')).toHaveCount(0);
+  await expect(first.locator('.cover-thumb img')).toHaveAttribute('src', firstPreview);
+  const buttonPreview = await second
+    .locator('.cover-thumb img')
+    .evaluate((image: HTMLImageElement) => image.src);
+
   for (const [label, text] of [
     ['Title', 'Pasted title'],
     ['Author', 'Pasted author'],
@@ -96,7 +113,7 @@ test('cover input remains row-local and preserves text paste', async ({ page }) 
     await second.getByLabel(label, { exact: true }).focus();
     await page.keyboard.press('ControlOrMeta+V');
     await expect(second.getByLabel(label, { exact: true })).toHaveValue(text);
-    await expect(second.locator('.cover-thumb img')).toHaveAttribute('src', pastedPreview);
+    await expect(second.locator('.cover-thumb img')).toHaveAttribute('src', buttonPreview);
   }
 
   const imageUrl = 'https://example.invalid/cover.png';
@@ -107,7 +124,7 @@ test('cover input remains row-local and preserves text paste', async ({ page }) 
   await page.evaluate((value) => navigator.clipboard.writeText(value), imageUrl);
   await second.locator('.cover-thumb').focus();
   await page.keyboard.press('ControlOrMeta+V');
-  await expect(second.locator('.cover-thumb img')).toHaveAttribute('src', pastedPreview);
+  await expect(second.locator('.cover-thumb img')).toHaveAttribute('src', buttonPreview);
   await expect(second.getByRole('alert')).toHaveCount(0);
   const urlDropPrevented = await second.locator('.cover-thumb').evaluate((element, url) => {
     const dataTransfer = new DataTransfer();
@@ -118,7 +135,7 @@ test('cover input remains row-local and preserves text paste', async ({ page }) 
   }, imageUrl);
   expect(urlDropPrevented).toBe(true);
   await expect(second.getByRole('alert')).toBeVisible();
-  await expect(second.locator('.cover-thumb img')).toHaveAttribute('src', pastedPreview);
+  await expect(second.locator('.cover-thumb img')).toHaveAttribute('src', buttonPreview);
   expect(remoteRequests).toEqual([]);
 
   await first.getByRole('button', { name: 'Remove cover', exact: true }).click();

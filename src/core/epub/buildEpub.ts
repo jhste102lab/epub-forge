@@ -57,6 +57,8 @@ export function buildEpub(
             book,
             book.title,
             `    <div class="image-page"><img src="${chapter.imagePath}" alt="${escapeXml(chapter.image.sourcePath)}"/></div>`,
+            'bodymatter',
+            chapter.image,
           )
         : chapterXhtml(book, chapter),
     );
@@ -67,7 +69,14 @@ export function buildEpub(
 
   if (coverImage) {
     files[`${CONTENT_DIR}/${coverImage.fileName}`] = [coverImage.bytes, { level: 0 }];
-    files[`${CONTENT_DIR}/${COVER_PATH}`] = strToU8(coverXhtml(book, coverImage.fileName));
+    files[`${CONTENT_DIR}/${COVER_PATH}`] = strToU8(
+      // Fixed-layout covers borrow the first page's viewport; the cover image is contained in it.
+      coverXhtml(
+        book,
+        coverImage.fileName,
+        chapters[0]?.kind === 'image' ? chapters[0].image : undefined,
+      ),
+    );
   }
 
   if (font) {
@@ -146,6 +155,13 @@ function contentOpf(
     ? `
     <meta name="cover" content="${COVER_IMAGE_ID}"/>`
     : '';
+  // Fixed pages let readers show one page in portrait and a two-page spread in landscape.
+  const layoutMetadata =
+    book.body.kind === 'images'
+      ? `
+    <meta property="rendition:layout">pre-paginated</meta>
+    <meta property="rendition:spread">landscape</meta>`
+      : '';
   const creatorMetadata = book.author.trim()
     ? `\n    <dc:creator>${escapeXml(book.author)}</dc:creator>`
     : '';
@@ -175,7 +191,7 @@ function contentOpf(
     <dc:identifier id="bookid">${escapeXml(identifier)}</dc:identifier>
     <dc:title>${escapeXml(book.title)}</dc:title>${creatorMetadata}
     <dc:language>${escapeXml(book.language)}</dc:language>
-    <meta property="dcterms:modified">${epubTimestamp(modified)}</meta>${coverMetadata}
+    <meta property="dcterms:modified">${epubTimestamp(modified)}</meta>${layoutMetadata}${coverMetadata}
   </metadata>
   <manifest>
     <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
@@ -254,13 +270,19 @@ ${body}`
   );
 }
 
-function coverXhtml(book: Book, coverFileName: string): string {
+function coverXhtml(book: Book, coverFileName: string, viewport?: Viewport): string {
   return xhtmlDocument(
     book,
     book.title,
     `    <div class="cover"><img src="${coverFileName}" alt="${escapeXml(book.title)}"/></div>`,
     'cover',
+    viewport,
   );
+}
+
+interface Viewport {
+  readonly width: number;
+  readonly height: number;
 }
 
 function xhtmlDocument(
@@ -268,13 +290,17 @@ function xhtmlDocument(
   title: string,
   bodyInner: string,
   epubType: 'bodymatter' | 'cover' = 'bodymatter',
+  viewport?: Viewport,
 ): string {
   const lang = escapeXml(book.language);
+  const viewportMeta = viewport
+    ? `\n    <meta name="viewport" content="width=${viewport.width}, height=${viewport.height}"/>`
+    : '';
   return `<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="${lang}" xml:lang="${lang}">
   <head>
-    <meta charset="utf-8"/>
+    <meta charset="utf-8"/>${viewportMeta}
     <title>${escapeXml(title)}</title>
     <link rel="stylesheet" type="text/css" href="${CSS_PATH}"/>
   </head>

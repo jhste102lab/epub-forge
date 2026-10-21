@@ -1,7 +1,7 @@
 import { unzipSync } from 'fflate';
 import { isSupported } from '../parse/registry';
 import { extensionOf, type FileLike } from '../parse/types';
-import type { BookSource, ImagePage } from '../types';
+import type { BookSource, ImageZipEntry } from '../types';
 
 export interface ExpandResult {
   /** Each source becomes one Book: a document or a complete image archive. */
@@ -60,7 +60,7 @@ export function expandZip(archive: FileLike): ExpandResult {
 }
 
 /** Extract original page bytes only during conversion, preserving full entry paths. */
-export function readImageZip(archive: FileLike): ImagePage[] {
+export function readImageZip(archive: FileLike): ImageZipEntry[] {
   const paths: string[] = [];
   const entries = unzipSync(archive.bytes, {
     filter: ({ name }) => {
@@ -137,7 +137,7 @@ function isImagePath(path: string): boolean {
   return Object.hasOwn(IMAGE_EXTENSIONS, extensionOf(path));
 }
 
-function sniffImageMediaType(bytes: Uint8Array): ImagePage['mediaType'] | undefined {
+function sniffImageMediaType(bytes: Uint8Array): ImageZipEntry['mediaType'] | undefined {
   if (bytes.length >= 4 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) {
     return 'image/jpeg';
   }

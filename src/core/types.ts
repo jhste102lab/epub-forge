@@ -37,7 +37,13 @@ export interface ImagePage {
   readonly sourcePath: string;
   readonly bytes: Uint8Array;
   readonly mediaType: 'image/jpeg' | 'image/png' | 'image/webp';
+  /** Decoded pixel size; becomes the fixed-layout page viewport. */
+  readonly width: number;
+  readonly height: number;
 }
+
+/** An image page read from a ZIP before decoding has measured it. */
+export type ImageZipEntry = Omit<ImagePage, 'width' | 'height'>;
 
 export type BookBody =
   | { readonly kind: 'text'; readonly paragraphs: readonly string[] }
